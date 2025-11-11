@@ -9,7 +9,7 @@ The function is triggered by EventBridge when a Maintenance Window execution cha
 ## Architecture
 
 ```
-EventBridge Rule (Maintenance Window State Change)
+EventBridge Rule (Maintenance Window Execution State-change Notification)
          ↓
     Lambda Function
          ↓
@@ -17,6 +17,8 @@ EventBridge Rule (Maintenance Window State Change)
 ```
 
 ## EventBridge Rule Pattern
+
+You can filter for other statuses, but MWs end with these.
 
 ```json
 {
@@ -103,15 +105,15 @@ EventBridge needs permission to invoke the Lambda function. This is automaticall
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL | Yes (currently hardcoded) |
+| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL | Yes |
 
-> **⚠️ Security Note:** The Slack webhook URL is currently hardcoded in the Lambda function. Consider moving it to AWS Secrets Manager or Lambda environment variables for better security.
+> **⚠️ Security Note:** Consider moving the Slack webhook URL to AWS Secrets Manager or Lambda environment variables for better security.
 
 ## Deployment
 
 ### Prerequisites
 
-- AWS CLI configured with appropriate credentials
+- AWS CLI configured with appropriate credentials (for programmatic use if wanted)
 - Slack incoming webhook URL
 - Existing SSM Maintenance Window(s)
 
@@ -120,7 +122,7 @@ EventBridge needs permission to invoke the Lambda function. This is automaticall
 1. Create a new Lambda function in the AWS Console
 2. Runtime: Python 3.9 or later
 3. Copy the provided Lambda code
-4. Set timeout to at least 30 seconds
+4. Set the timeout to at least 30 seconds
 5. Attach the IAM role with the permissions listed above
 
 ### Step 2: Add Lambda Layer (if needed)
@@ -135,7 +137,7 @@ The `urllib3` library is included in the Lambda Python runtime, so no additional
 
 ### Step 4: Configure Slack Webhook
 
-1. Create an incoming webhook in your Slack workspace
+1. Create an incoming webhook in your Slack workspace via the Slack API portal. Might ned approval from Slack admins.
 2. Update the `SLACK_WEBHOOK_URL` in the Lambda code or use environment variables
 
 ## Slack Notification Format
@@ -159,18 +161,18 @@ The function sends formatted Slack messages with the following information:
 ### Lambda Function Errors
 
 - **Permission Denied**: Verify IAM role has all required SSM permissions
-- **Timeout**: Increase Lambda timeout if dealing with large maintenance windows
+- **Timeout**: Increase Lambda timeout if dealing with large maintenance windows, or optimise the code to take less time
 - **Slack Message Failed**: Verify webhook URL is correct and accessible
 
 ### No Notifications Received
 
-- Check EventBridge rule is enabled
-- Verify Lambda function has resource-based policy allowing EventBridge invocation
+- Check if the EventBridge rule is enabled. The event used specifically is the one that triggers EventBridge when the MW changes statuses.
+- Verify the Lambda function has a resource-based policy allowing EventBridge invocation
 - Check CloudWatch Logs for Lambda execution errors
 
 ## Sample Event
 
-Example EventBridge event that triggers the Lambda function:
+Example EventBridge event payload that triggers the Lambda function:
 
 ```json
 {
@@ -192,6 +194,8 @@ Example EventBridge event that triggers the Lambda function:
 }
 ```
 
+You need to retrieve the data exactly by its name in JSON. Refer to AWS EventBridge docs to ensure attribute names.
+
 ## Dependencies
 
 - `boto3`: AWS SDK for Python (included in Lambda runtime)
@@ -209,11 +213,3 @@ Example EventBridge event that triggers the Lambda function:
 - Lambda invocations: One per maintenance window execution
 - CloudWatch Logs: Storage for Lambda execution logs
 - EventBridge: No additional cost for rule evaluations
-
-## License
-
-This project is provided as-is for internal use.
-
-## Support
-
-For issues or questions, contact the DevOps team or open an issue in the repository.
