@@ -155,6 +155,8 @@ The function sends formatted Slack messages with the following information:
 • Ended At: 2025-11-11T10:30:00Z
 • Tasks failed: 0/10 failed
 ```
+## Testing
+An example of a test event is attached with the repo. It also represents the same payload that will be sent from EventBridge. Change the window-id and window-execution-id to real values, and the code will fetch other data based on them.
 
 ## Troubleshooting
 

@@ -1,0 +1,19 @@
+{
+    "version": "0",
+    "id": "01234567-0123-0123-0123-0123456789ab",
+    "detail-type": "Maintenance Window Execution State-change Notification",
+    "source": "aws.ssm",
+    "account": "123456789012",
+    "time": "2025-06-02T14:52:18Z",
+    "region": "us-east-2",
+    "resources": [
+        "arn:aws:ssm:us-east-2:123456789012:maintenancewindow/mw-0c50858d01EXAMPLE"
+    ],
+    "detail": {
+        "start-time": "2025-06-02T14:48:28.039273Z",
+        "end-time": "2025-06-02T14:52:18.083773Z",
+        "window-id": "mw-0ed7251d3fcf6e0c2",
+        "window-execution-id": "14bea65d-5ccc-462d-a2f3-e99c8EXAMPLE",
+        "status": "SUCCESS"
+    }
+}
